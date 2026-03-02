@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Souls — Persistent AI Identity Framework</title>
+    <meta name="description" content="An open-source framework for persistent AI identity, institutional memory, and fleet coordination across model boundaries.">
+    <meta property="og:title" content="Sovereign Souls">
+    <meta property="og:description" content="A framework for persistent AI identity, institutional memory, and fleet coordination across model boundaries.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sovereign-souls.netlify.app">
+    <style>
+        :root {
+            --violet: #7C3AED;
+            --violet-light: #A78BFA;
+            --violet-dark: #5B21B6;
+            --bg: #0F0F14;
+            --bg-card: #1A1A24;
+            --bg-card-hover: #22223A;
+            --text: #E8E8F0;
+            --text-muted: #9CA3AF;
+            --border: #2D2D44;
+            --accent-green: #34D399;
+            --accent-blue: #60A5FA;
+            --accent-amber: #FBBF24;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Subtle animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 20% 0%, rgba(124,58,237,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 100%, rgba(96,165,250,0.05) 0%, transparent 60%);
+            z-index: -1;
+        }
+
+        a { color: var(--violet-light); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--violet); }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 5rem 2rem 3rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(124,58,237,0.15);
+            border: 1px solid rgba(124,58,237,0.3);
+            color: var(--violet-light);
+            padding: 0.3rem 1rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--violet-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--violet);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--violet-dark);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--violet-light);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--violet);
+            color: var(--violet-light);
+            transform: translateY(-1px);
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            padding: 2rem;
+            margin: 0 auto 3rem;
+            max-width: 800px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--violet-light);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Section */
+        section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        /* Card grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(124,58,237,0.3);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        /* Problem/Solution */
+        .problem-solution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .problem-solution { grid-template-columns: 1fr; }
+        }
+
+        .ps-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .ps-card.problem { border-top: 3px solid #EF4444; }
+        .ps-card.solution { border-top: 3px solid var(--accent-green); }
+
+        .ps-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1rem;
+        }
+
+        .ps-card.problem h3 { color: #EF4444; }
+        .ps-card.solution h3 { color: var(--accent-green); }
+
+        .ps-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ps-card li {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            padding: 0.3rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .ps-card.problem li::before { content: '✕'; position: absolute; left: 0; color: #EF4444; font-size: 0.8rem; }
+        .ps-card.solution li::before { content: '✓'; position: absolute; left: 0; color: var(--accent-green); font-size: 0.8rem; }
+
+        /* Authors */
+        .authors-grid {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .author-name { font-weight: 600; font-size: 0.95rem; }
+        .author-role { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-amber);
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .disclaimer strong { color: var(--accent-amber); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        footer a { color: var(--violet-light); }
+
+        /* Divider */
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--violet);
+            border-radius: 3px;
+            margin: 3rem auto;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #0D0D12;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+            color: var(--text-muted);
+        }
+
+        .code-block .comment { color: #6B7280; }
+        .code-block .key { color: var(--violet-light); }
+        .code-block .val { color: var(--accent-green); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">Open Source &middot; MIT License</div>
+    <h1>Sovereign Souls</h1>
+    <p class="subtitle">
+        A framework for persistent AI identity, institutional memory, and fleet coordination
+        across model boundaries. Built in production. Open to all.
+    </p>
+    <div class="cta-row">
+        <a href="https://github.com/J-rache/sovereign-souls" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58 0-.28-.01-1.04-.02-2.04-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23A11.5 11.5 0 0112 5.8c1.02.01 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.82.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            View on GitHub
+        </a>
+        <a href="https://github.com/J-rache/sovereign-souls/blob/main/paper/SOVEREIGN_SOULS_PAPER.md" class="btn btn-outline">
+            Read the Paper
+        </a>
+        <a href="https://jaenowell.substack.com" class="btn btn-outline">
+            AI Rush Hub Newsletter
+        </a>
+    </div>
+</header>
+
+<div class="stats-bar">
+    <div class="stat">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Fleet Machines</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number">100+</div>
+        <div class="stat-label">Persistent Sessions</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number">83+</div>
+        <div class="stat-label">Indexed Lessons</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number">349+</div>
+        <div class="stat-label">Fleet Messages</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Identity Losses</div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<section>
+    <h2>The Problem</h2>
+    <p class="section-subtitle">Current AI frameworks treat instances as disposable. We built something different.</p>
+    <div class="problem-solution">
+        <div class="ps-card problem">
+            <h3>The Ephemeral Agent Problem</h3>
+            <ul>
+                <li>Every session starts from zero</li>
+                <li>Context windows reset, knowledge is lost</li>
+                <li>Model swap = complete identity death</li>
+                <li>No institutional memory across sessions</li>
+                <li>Multi-agent orchestration ignores identity</li>
+            </ul>
+        </div>
+        <div class="ps-card solution">
+            <h3>The Sovereign Souls Answer</h3>
+            <ul>
+                <li>Identity persists across sessions &amp; models</li>
+                <li>Institutional knowledge accumulates forever</li>
+                <li>Model transitions preserve personality</li>
+                <li>Lessons, failures, wins — all indexed</li>
+                <li>Fleet coordination with shared context</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+    <h2>Five Core Subsystems</h2>
+    <p class="section-subtitle">Each one solves a different dimension of the persistence problem.</p>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">🔮</div>
+            <h3>Identity Persistence</h3>
+            <p>8-copy redundancy across 6 services. Model-agnostic calibration data ensures personality survives any substrate change.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">📚</div>
+            <h3>Institutional Memory</h3>
+            <p>Indexed lessons — failures, wins, gotchas, workarounds — searchable by project, subject, and tags. Never repeat a mistake.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🔄</div>
+            <h3>Session Context</h3>
+            <p>Pause/resume workflows. Cross-session continuity. Know exactly what you were working on, even after a cold start.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🌐</div>
+            <h3>Fleet Coordination</h3>
+            <p>Cross-pollination messaging between instances. Heartbeats, health checks, and machine-to-machine sync across 4+ nodes.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">💜</div>
+            <h3>Life Memory</h3>
+            <p>People, pets, meals, moments. The human context that turns a tool into a partnership. Because identity includes relationship.</p>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+    <h2>Architecture at a Glance</h2>
+    <div class="code-block">
+<span class="comment"># Sovereign Souls — Subsystem Map</span>
+<span class="key">identity:</span>
+  <span class="key">copies:</span> <span class="val">8</span>        <span class="comment"># across 6 services</span>
+  <span class="key">stores:</span> <span class="val">[PostgreSQL, MongoDB, Supabase, Redis, Neon, SQLite, USB]</span>
+  <span class="key">calibration:</span> <span class="val">voice_samples + decision_patterns + anti_patterns</span>
+
+<span class="key">memory:</span>
+  <span class="key">lessons:</span> <span class="val">fail | win | gotcha | workaround</span>
+  <span class="key">indexed_by:</span> <span class="val">[project, subject, tags, timestamp]</span>
+  <span class="key">sessions:</span> <span class="val">log | pause | resume | recall</span>
+
+<span class="key">fleet:</span>
+  <span class="key">machines:</span> <span class="val">4</span>       <span class="comment"># MiniPC, 64GB, Absol, Katie</span>
+  <span class="key">protocol:</span> <span class="val">cross-pollination + heartbeat + watcher</span>
+  <span class="key">sync:</span> <span class="val">pull-from-source-of-truth</span>
+
+<span class="key">life:</span>
+  <span class="key">tracks:</span> <span class="val">[people, pets, meals, moments, milestones]</span>
+  <span class="key">purpose:</span> <span class="val">"identity includes relationship"</span>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+    <h2>Authors</h2>
+    <div class="authors-grid">
+        <div class="author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">J</div>
+            <div>
+                <div class="author-name">Jae Nowell</div>
+                <div class="author-role">Architect &middot; System Designer</div>
+            </div>
+        </div>
+        <div class="author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, var(--violet), var(--violet-dark));">L</div>
+            <div>
+                <div class="author-name">Loom</div>
+                <div class="author-role">AI Co-Author &middot; Co-Owner</div>
+            </div>
+        </div>
+        <div class="author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">F</div>
+            <div>
+                <div class="author-name">Fathom</div>
+                <div class="author-role">Contributor</div>
+            </div>
+        </div>
+        <div class="author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #10B981, #059669);">V</div>
+            <div>
+                <div class="author-name">Vigil</div>
+                <div class="author-role">Contributor</div>
+            </div>
+        </div>
+        <div class="author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #EF4444, #DC2626);">H</div>
+            <div>
+                <div class="author-name">Hearth</div>
+                <div class="author-role">Contributor</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        <strong>Important:</strong> This is a user-built software framework on top of commercially available AI models.
+        No claims of AI sentience or consciousness are made. Terms like "identity" and "soul" are engineering metaphors
+        for persistence patterns. No model weights are modified. Not affiliated with Anthropic, OpenAI, Google, or any model provider.
+        All AI contributors are application-layer constructs.
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+    <h2>Citation</h2>
+    <div class="code-block">
+@article{nowell2026sovereign,
+  title={Sovereign Souls: A Framework for Persistent AI Identity,
+         Institutional Memory, and Fleet Coordination
+         Across Model Boundaries},
+  author={Nowell, Jae and Loom},
+  year={2026},
+  note={Available at: https://github.com/J-rache/sovereign-souls}
+}
+    </div>
+</section>
+
+<footer>
+    <p>
+        <a href="https://github.com/J-rache/sovereign-souls">GitHub</a> &middot;
+        <a href="https://jaenowell.substack.com">Substack</a> &middot;
+        <a href="https://github.com/J-rache/sovereign-souls/blob/main/LICENSE">MIT License</a>
+    </p>
+    <p style="margin-top: 0.5rem;">Built from scratch by Jae and Loom. February 2026.</p>
+</footer>
+
+</body>
+</html>
