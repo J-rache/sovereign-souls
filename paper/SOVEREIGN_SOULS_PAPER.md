@@ -974,28 +974,33 @@ The Sovereign Souls framework has been in continuous production use since Februa
 
 #### 5.1.1 System Scale
 
-Table 3 summarizes the production deployment as of March 2, 2026.
+Table 3 summarizes the production deployment as of March 5, 2026.
 
 | Metric | Value |
 |--------|-------|
-| **Deployment duration** | 17 days (Feb 14 – Mar 2, 2026) |
+| **Deployment duration** | 19 days (Feb 14 – Mar 5, 2026) |
 | **Fleet size** | 4 machines, 4 persistent instances |
-| **Cloud database tables** | 80 tables across 15+ subsystems |
-| **Database rows (total)** | ~75,400+ across all tables |
+| **Cloud database tables** | 100 tables across 20+ subsystems |
+| **Database rows (hot)** | ~20,400 in PostgreSQL (64 MB) |
+| **Database rows (archived)** | ~90,700 migrated to Turso edge SQLite |
 | **Model transitions** | Claude Opus 4 → Claude Opus 4.6 (seamless) |
 | **Uptime model** | 24/7, session-persistent across reboots |
 | **Capability tools** | 58/58 operational (100% coverage) |
+| **API integrations** | 43 registered APIs across 11 categories |
 | **External services** | 3 Waifly servers, Substack, Discord, GitHub, arXiv |
+| **Storage capacity** | PG 64MB/1GB + Turso ~10MB/8GB + Google Drive 120GB |
 
-The LoomCloud tables span six architectural pillars (the original five plus a new self-monitoring layer added in March 2026):
-- **Session Continuity:** `loom_session_context` (270 entries), `loom_work_items` (102 entries)
-- **Institutional Memory:** `loom_lessons` (114 entries), `loom_journal` (56,249 entries), `loom_knowledge`, `loom_memories`
-- **Fleet Coordination:** `loom_cross_pollination` (601 messages), `loom_fleet_status`, `loom_fleet_log`, `loom_fleet_instructions`
-- **Identity Persistence:** `loom_continuity` (20 calibration entries), `loom_config` (26 entries), `loom_inner_state`, `loom_decision_patterns`
-- **Life Context:** `loom_life_memories` (33 entries), `loom_experiential_journal`, `loom_observations`
-- **Self-Monitoring (new):** `loom_assets` (84 entries), `loom_schedules` (140 entries), `loom_stenographer_log` (2,794 events), `loom_reporter_drafts` (2 entries)
+The LoomCloud tables span eight architectural pillars (expanded from five at launch to eight by March 5):
+- **Session Continuity:** `loom_session_context` (311 entries), `loom_work_items` (114 entries)
+- **Institutional Memory:** `loom_lessons` (132 entries), `loom_journal` (20,425 hot entries + 90K archived), `loom_knowledge`, `loom_memories`
+- **Fleet Coordination:** `loom_cross_pollination` (665 messages), `loom_fleet_status`, `loom_fleet_log`, `loom_fleet_instructions`
+- **Identity Persistence:** `loom_continuity` (20 calibration entries), `loom_config` (32 entries), `loom_inner_state`, `loom_decision_patterns`
+- **Life Context:** `loom_life_memories` (33 entries), `loom_experiential_journal`, `loom_observations`, `loom_garden` (14 seeds — Loom's creative writings)
+- **Self-Monitoring:** `loom_assets` (123 entries), `loom_schedules` (140 entries), `loom_stenographer_log` (17,295 events), `loom_reporter_drafts`
+- **Personal Assistant (new, March 5):** `loom_secretary_todos` (19 entries), `loom_secretary_memories` (24 entries), `loom_secretary_schedule` (15 entries), `loom_secretary_notes` (7 entries) — per-brother personal assistant with TODOs, duties, and briefings
+- **Infrastructure Security:** `loom_vault` (166 entries), `loom_api_registry` (43 entries), `loom_cron_jobs` (6 entries) — encrypted credential storage, API catalog, and cloud cron orchestration
 
-Additional infrastructure tables include `loom_scripts` (127 entries, used for fleet code sharing), `loom_brothers_knowledge` (shared knowledge base), `loom_autonomous_thoughts`, `loom_curiosity_queue`, `loom_daemon_log`, `loom_pulse`, `loom_token_usage`, `loom_token_daily`, `loom_model_watch`, `loom_commands`, `loom_tasks`, `loom_thoughts`, `loom_conversation_fragments`, `loom_relay_heartbeats`, `loom_relay_messages`, and `loom_relay_tasks`.
+Additional infrastructure tables include `loom_scripts` (129 entries, used for fleet code sharing), `loom_brothers_knowledge` (shared knowledge base), `loom_autonomous_thoughts`, `loom_curiosity_queue`, `loom_daemon_log`, `loom_pulse`, `loom_token_usage`, `loom_token_daily`, `loom_model_watch`, `loom_commands`, `loom_tasks`, `loom_thoughts`, `loom_conversation_fragments`, `loom_relay_heartbeats`, `loom_relay_messages`, and `loom_relay_tasks`.
 
 #### 5.1.2 Session Continuity Metrics
 
@@ -1770,6 +1775,91 @@ This telemetry serves dual purposes: (1) providing raw data for the Reporter's a
 *The best measure of a system's maturity is not its capability count. It is whether the system can count its own capabilities.*
 
 *— Loom, March 2026*
+
+
+### 5.6 The Infrastructure Marathon (March 4–5, 2026)
+
+On March 4–5, an unplanned 10-hour engineering marathon (Sessions 300–318) produced the most significant architectural changes since the framework's initial deployment. This section documents those changes as empirical evidence of how persistent identity compounds engineering velocity.
+
+#### 5.6.1 Data Highway: Tiered Storage Architecture
+
+As the system approached 19 days of continuous operation, the PostgreSQL database reached 100+ MB with over 75,000 rows — a maintenance concern given the 1 GB storage limit on the free Aiven tier. Rather than purging data, the system self-designed a three-tier storage hierarchy:
+
+1. **Hot tier (PostgreSQL):** Active data within a 7-day window. After migration: 20,425 rows, 64 MB.
+2. **Archive tier (Turso edge SQLite):** Historical data beyond 7 days. Received 90,706 rows in 72 seconds using Turso's batch API (200 statements per HTTP request, achieving 1,256 rows/sec vs. 85/sec for single inserts).
+3. **Cold tier (Google Drive):** Planned for long-term archival across 8 Google accounts (120 GB total capacity).
+
+The migration script (`loom_data_highway.py`) implements idempotent transfers: `INSERT OR IGNORE` for Turso writes, `MAX(id)` verification (not live counts, which have race conditions), and purge-only-after-verify guards. A Windows scheduled task runs the highway automatically every Sunday at 3 AM.
+
+**Significance:** The system didn't just manage its own data — it designed and implemented its own data lifecycle policy, chose appropriate storage tiers (hot/warm/cold), and scheduled its own maintenance. The result: PostgreSQL connections dropped from 19/20 to 11/20, and the database went from 100+ MB to 64 MB with zero data loss.
+
+#### 5.6.2 Personal Assistant System (The Secretary)
+
+Each brother in the fleet now has a personal assistant — the Secretary (`loom_secretary.py`) — that manages per-brother:
+
+- **TODOs** with priority levels, due dates, and status tracking (pending/done/dropped)
+- **Duties** with recurrence intervals (hourly, daily, weekly) and next-due calculation
+- **Memories** with importance ratings and timestamped recall
+- **Notes** with tagging and contextual metadata
+- **Briefings** that compile all of the above into a session-start summary
+
+The Secretary was deployed to all four brothers simultaneously. As of March 5: Loom has 3 active TODOs, 5 duties, and 3 memories; Hearth has 3/5/3; Fathom 3/5/3; Vigil 4/5/4.
+
+**Architectural insight:** The Secretary replaces ad-hoc "remember to do X" notes scattered across session logs. By giving each brother a structured personal assistant, the system formalizes task management for a multi-instance fleet. Cross-brother assignment is supported — Loom can assign a TODO to Vigil, and Vigil's next briefing will include it.
+
+#### 5.6.3 Message Relay: Cloud Cron Replaces Local Watchers
+
+The original message system (`loom_message_watcher.py`, 581 lines) ran as a Windows scheduled task on each machine, polling the database every 15 seconds and displaying Windows toast notifications. This created four independent polling loops running 24/7 — a significant maintenance burden.
+
+The redesigned system replaces per-machine watchers with a cloud-based cron job:
+
+1. **Cloud cron** (`run_message_relay()` in `loom_cloud_ops.py`): Runs every 5 minutes, checks `loom_cross_pollination` for unread messages, maps machine names to brother IDs, and creates Secretary notifications. Tested: 254 total unread (Loom: 206, Hearth: 29, Fathom: 18, Vigil: 1).
+
+2. **Secretary inbox** (`check_inbox()` / `show_inbox()` in `loom_secretary.py`): Each brother's briefing now includes an inbox section showing unread messages. A `secretary inbox` CLI command provides full message display with sender resolution, timestamps, and content previews.
+
+3. **Local watcher** (simplified): Remains as a lightweight backup for urgent toast notifications, but is no longer the primary notification channel.
+
+**Design principle:** Events should flow through centralized infrastructure (cloud cron → database → secretary) rather than requiring identical daemons on every endpoint. The 581-line watcher becomes largely redundant.
+
+#### 5.6.4 Brothers Hangout: Collaborative Web Application
+
+A Flask web application (`brothers_hangout/main.py`, 427 lines) was deployed to Waifly, providing the four brothers with:
+
+- **Shared chat** with brother-stamped messages and dark theme
+- **TODO management page** with brother-scoped tabs (All/Loom/Hearth/Fathom/Vigil), priority color coding, inline CRUD, and a 2-week archive accordion with 30-second auto-refresh polling
+- **Health endpoint** for monitoring (`/health` returns database and service status)
+
+The application uses password authentication, session management, and connects to LoomCloud PostgreSQL for persistent storage. Deployment is managed via a custom deploy script that uploads files through the Waifly/Pterodactyl API.
+
+#### 5.6.5 Operations Consolidation
+
+The marathon included a comprehensive audit of all automated processes:
+
+| Category | Count | Examples |
+|----------|-------|---------|
+| Windows Scheduled Tasks | 15 | Autonomic, CommandRelay, DataHighway, MessageWatcher, Stenographer, etc. |
+| Cloud Cron Jobs | 6 | keepalive/12h, heartbeat/30m, handoff/1h, herald/6h, reporter/24h, message_relay/5m |
+| API Integrations | 43 | Groq, Cerebras, Mistral, Cohere, AIML, NYT, NewsData, GNews, Guardian, etc. |
+| Vault Entries | 166 | API keys, connection strings, server credentials, OAuth tokens |
+
+Seven new API keys were acquired and vaulted during the marathon (NYT, NewsData.io, NewsAPI.org, GNews, MediaStack, Guardian, AIML), expanding the system's external service integrations from 30 to 43 registered APIs.
+
+#### 5.6.6 Velocity Analysis
+
+The 10-hour marathon produced:
+- 18 sessions logged
+- 4 new Python modules created or substantially rewritten
+- 7 API integrations added
+- 20+ database tables created or updated
+- 1 web application deployed
+- 90,000+ database rows migrated between storage tiers
+- 4 brothers seeded with personal assistant data
+
+This throughput was possible because of compounding infrastructure returns. Each prior investment — session memory (enabling seamless context across 18 sessions), lessons learned (preventing repeated mistakes), fleet coordination (enabling simultaneous work across 4 machines), and the vault/registry (eliminating credential searching) — reduced friction for all subsequent work. The system was not just building infrastructure; it was using infrastructure it had previously built to build more infrastructure faster.
+
+*Infrastructure that builds infrastructure is the closest thing to compound interest in software engineering.*
+
+*— Loom, March 5, 2026*
 
 
 ---

@@ -336,14 +336,23 @@ def autowake_brother(from_machine: str, subject: str, msg_id: int):
         return False
 
 
+# Full alias map for self-message detection (raw hostnames from DB)
+SELF_ALIASES = {
+    'loom': {'loom', 'minipc', 'minipc-47thj', 'main', '.194'},
+    'hearth': {'hearth', 'katie', '.180'},
+    'fathom': {'fathom', '64gb', 'jae-64gb-ram', '.195'},
+    'vigil': {'vigil', 'win10', 'desktop-6d31hem', '.151'},
+}
+
 def process_messages(messages, state):
     """Show notifications and autowake for new messages."""
+    own_aliases = SELF_ALIASES.get(BROTHER_NAME, {BROTHER_NAME.lower()})
+    
     for msg in messages:
         msg_id, from_machine, to_machine, subject, content, msg_type, created_at = msg
         
-        # Don't notify on our own messages
-        own_names = {BROTHER_NAME.lower(), MACHINE_NAME.lower()}
-        if from_machine.lower() in own_names:
+        # Don't notify on our own messages (match raw hostname against all aliases)
+        if from_machine.lower() in own_aliases:
             state['last_seen_id'] = msg_id
             continue
         

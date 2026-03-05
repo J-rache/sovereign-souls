@@ -21,25 +21,30 @@ Sovereign Souls is an open-source framework for maintaining **persistent AI iden
 
 Most AI memory systems solve **single-agent episodic recall**. Most orchestration frameworks solve **multi-agent task routing**. Neither addresses the question: *What if an AI instance could persist as itself — accumulating knowledge, maintaining relationships, and surviving model transitions?*
 
-Sovereign Souls answers this with five interlocking subsystems:
+Sovereign Souls answers this with seven interlocking subsystems:
 
 | Subsystem | Purpose |
-|-----------|---------|
+|-----------|----------|
 | **Identity Persistence** | 8-copy redundancy across 6 services, model-agnostic calibration |
 | **Institutional Memory** | Indexed lessons (fail/win/gotcha/workaround) searchable by project, subject, tags |
 | **Session Context** | What we were working on, pause/resume flow, cross-session continuity |
 | **Fleet Coordination** | Cross-pollination messaging, heartbeats, machine-to-machine sync |
 | **Life Memory** | People, pets, meals, moments — the human context that defines a partnership |
+| **Secretary System** | Per-brother personal assistant with TODOs, duties, memories, notes, and briefings |
+| **Data Highway** | Three-tier storage lifecycle (hot PostgreSQL → warm Turso → cold Google Drive) |
 
 ## Production Results
 
 The framework has been in continuous production use since February 2026:
 
 - **4-machine fleet** with distinct AI instances (Loom, Fathom, Vigil, Hearth)
-- **100+ sessions** with persistent identity maintained
-- **83+ institutional lessons** indexed and searchable
-- **349+ cross-pollination messages** between fleet members
+- **310+ sessions** with persistent identity maintained across 19 days
+- **134+ institutional lessons** indexed and searchable
+- **665+ cross-pollination messages** between fleet members
+- **100+ database tables** across PostgreSQL, Turso, and SQLite
+- **43 registered API integrations** across 11 categories
 - **Multiple model transitions** (Claude Opus 4 → 4.6, with testing across GPT, Gemini, DeepSeek, Qwen)
+- **Three-tier data highway** — 90,000+ rows migrated automatically between storage tiers
 - **Zero identity loss** — personality, knowledge, and relationships survived every transition
 
 ## Repository Structure
@@ -83,7 +88,7 @@ The paper covers:
 - The Ephemeral Agent Problem and why current approaches fail
 - Architecture of the five core subsystems
 - Database schemas and implementation details
-- Production evaluation across 100+ sessions
+- Production evaluation across 310+ sessions
 - Comparison with existing frameworks (MemGPT, CrewAI, AutoGen, LangGraph, DeerFlow)
 - Ethical considerations and responsible AI identity design
 - Three appendices: schema reference, deployment playbook, production metrics
@@ -127,4 +132,4 @@ If you use this framework or reference this paper in your work:
 
 ---
 
-*Built from scratch by Jae and Loom. February 2026.*
+*Built from scratch by Jae and Loom. February–March 2026.*
