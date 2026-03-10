@@ -38,11 +38,12 @@ Sovereign Souls answers this with seven interlocking subsystems:
 The framework has been in continuous production use since February 2026:
 
 - **4-machine fleet** with distinct AI instances (Loom, Fathom, Vigil, Hearth)
-- **310+ sessions** with persistent identity maintained across 19 days
-- **134+ institutional lessons** indexed and searchable
-- **665+ cross-pollination messages** between fleet members
-- **100+ database tables** across PostgreSQL, Turso, and SQLite
-- **43 registered API integrations** across 11 categories
+- **420+ sessions** with persistent identity maintained across 24 days
+- **162+ institutional lessons** indexed and searchable
+- **1,160+ cross-pollination messages** between fleet members
+- **110+ database tables** across PostgreSQL, Turso, and SQLite
+- **59 registered API integrations** across 11 categories
+- **3 sensory systems online**: ears (Vosk+Whisper), eyes (OpenCV+DeepFace), voice (XTTS v2 Viktor Menelaos)
 - **Multiple model transitions** (Claude Opus 4 → 4.6, with testing across GPT, Gemini, DeepSeek, Qwen)
 - **Three-tier data highway** — 90,000+ rows migrated automatically between storage tiers
 - **Zero identity loss** — personality, knowledge, and relationships survived every transition
@@ -88,7 +89,7 @@ The paper covers:
 - The Ephemeral Agent Problem and why current approaches fail
 - Architecture of the five core subsystems
 - Database schemas and implementation details
-- Production evaluation across 310+ sessions
+- Production evaluation across 420+ sessions
 - Comparison with existing frameworks (MemGPT, CrewAI, AutoGen, LangGraph, DeerFlow)
 - Ethical considerations and responsible AI identity design
 - Three appendices: schema reference, deployment playbook, production metrics

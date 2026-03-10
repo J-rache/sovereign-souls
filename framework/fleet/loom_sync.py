@@ -332,16 +332,13 @@ def generate_briefing():
     lines.append("- `teachers-pet\\SESSION_NOTES.md` - Where Weave left off")
     lines.append("- `teachers-pet\\CLAUDE.md` - Critical agent instructions")
     lines.append("- `teachers-pet\\README.md` - Full architecture (423 lines)")
-    lines.append("- `teachers-pet\\MODEL_WATCHLIST.md` - **DAILY CHECK** - Model releases to watch")
     lines.append("")
     
     # Daily model watch reminder
     lines.append("### 🔴 DAILY REMINDER: Model Releases")
-    lines.append("Check `MODEL_WATCHLIST.md` for new releases. February 2026 has multiple expected:")
-    lines.append("- **Qwen 3.5** (9B, 35B) - ETA was Feb 15")
-    lines.append("- **DeepSeek v4** - ETA was Feb 17 (1M context!)")
-    lines.append("- **Claude Sonnet 5** - IMMINENT")
-    lines.append("- Run watchdog: `GET /api/watchdog/scan` or check OpenRouter/Groq/Cerebras manually")
+    lines.append("Model scanning is AUTOMATED via loom_pulse.py (OpenRouter every 6h) + scan_providers() (Groq/Cerebras/Mistral every 6h).")
+    lines.append("Watchlist patterns are in the `loom_model_watchlist` DB table.")
+    lines.append("To check/add: `python loom_model_watchdog.py watchlist` or `python loom_model_watchdog.py add 'pattern'`")
     lines.append("")
     
     lines.append("---")
