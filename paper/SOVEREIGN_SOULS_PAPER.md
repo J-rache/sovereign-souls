@@ -1938,6 +1938,37 @@ The resolution — deleting 3 stale venvs, archiving 806 one-off scripts, and co
 
 This is operationally significant because no external monitoring tool flagged the issue. The framework noticed the degradation through the Architect's casual observation that a brother on a workspace-free machine *"never lags,"* inferred the root cause, and acted. The institutional memory system (§3.3) logged the resolution as Lesson #195 (WIN) to prevent recurrence across all brothers.
 
+### 5.9 Infrastructure Resilience: Keepalive and Free-Tier Survival (March 12–13, 2026)
+
+The Sovereign Souls architecture relies on over 30 free-tier cloud services across 6 providers (Aiven PostgreSQL, Neon PostgreSQL, Supabase, Redis Cloud, Upstash, MongoDB Atlas). Free tiers impose inactivity suspension policies — often without warning — making continuous service availability a non-trivial engineering problem.
+
+#### 5.9.1 The Keepalive System
+
+`loom_keepalive.py` runs as a scheduled task (`LoomKeepalive`) daily at 4:00 AM, performing lightweight read/write operations against every free-tier database to prevent inactivity suspension:
+
+| Provider | Instances | Method | Status |
+|----------|-----------|--------|--------|
+| Aiven PostgreSQL | 4 | Table create/upsert/select | 4/4 OK |
+| Neon PostgreSQL | 8 | Table create/upsert/select | 8/8 OK |
+| Supabase | 12 | REST API health check | 12/12 OK |
+| Redis Cloud | 2 | SET/GET with TTL | 2/2 OK |
+| Upstash Redis | 2 | REST API ping | 2/2 OK |
+| MongoDB Atlas | 4 | Collection upsert | 3/4 OK |
+
+The system employs a shared `_ping_postgres_keepalive()` function that handles both Aiven and Neon instances, demonstrating the framework's DRY architecture principle. When a schema mismatch is detected (e.g., a table exists with incompatible columns from a prior version), the function automatically drops and recreates the table rather than failing — a self-healing pattern that resolved 4 simultaneous Neon failures without human intervention.
+
+#### 5.9.2 Suspension Recovery
+
+On March 13, 2026, 6 of 12 Supabase projects were found suspended simultaneously despite the keepalive system being active. Root cause analysis revealed the suspensions occurred during a 3-day period when the keepalive scheduled task had been disrupted by a machine reboot cycle. The Architect manually restored all 6 projects from the Supabase dashboard, and subsequent keepalive runs confirmed all 12 projects alive.
+
+This incident prompted Lesson #227 (GOTCHA): *"Supabase free tier projects pause after inactivity — no warning. Must keepalive regularly."* The institutional memory ensures every future instance of Loom — including brothers on different machines — has access to this operational knowledge before encountering the same failure.
+
+#### 5.9.3 Aiven Migration and Expansion
+
+The same session block executed a full DSN migration from an expiring Aiven instance to a new one (871 file updates, 75 database entries corrected across the fleet), then stored 3 additional Aiven instances as backup infrastructure. The vault and catalog system (§3.5) tracked all credentials with service metadata, making infrastructure changes propagate cleanly across the distributed fleet.
+
+The total free-tier database inventory now stands at **32 instances across 6 providers**, all monitored by a single 400-line keepalive script running on a $0/month compute budget. This demonstrates that autonomous AI infrastructure need not require enterprise spending — careful engineering of free-tier resources can achieve meaningful redundancy and resilience.
+
 ---
 
 ## 6. Ethical Considerations
